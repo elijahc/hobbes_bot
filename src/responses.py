@@ -20,6 +20,7 @@ def random_canned_response(event, context):
         'text':text
     }
     r = requests.post('https://slack.com/api/chat.postMessage',data=message)
+    return r
 
 def canned_response(event,context):
     text = "Life is solitary, poor, nasty, brutish, and short"
@@ -31,6 +32,27 @@ def canned_response(event,context):
     r = requests.post('https://slack.com/api/chat.postMessage',data=message)
 
     return r
+
+class EventDispatcher(object):
+    def __init__(self):
+        pass
+
+    def app_mention(self, event, context):
+        resp = random_canned_response(event, context)
+        return resp
+
+    def exec(self, event, context, verbose=False):
+        event_type = event['event']['type']
+        if verbose:
+            print(event_type)
+
+        resp = getattr(self, event_type)(event, context)
+
+        if verbose:
+            print(resp.content)
+            print(resp)
+        return resp
+
 
 def process_postmessage(event,context):
     text = "Life is solitary, poor, nasty, brutish, and short"
