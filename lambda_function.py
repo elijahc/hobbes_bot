@@ -2,11 +2,11 @@ import json
 from botocore.vendored import requests
 
 VERIFICATION_TOKEN = 'WiZIOhg6d7K22FY1vJGHindS'
-ACCESS_TOKEN = 'xoxb-295199771607-673384390295-FtiRuYAFrJnqKqoDiTM5Wb2v'
+ACCESS_TOKEN = 'xoxp-295199771607-293477083728-660133512179-729dd16f7cbc096a49fc776384c7140d'
 # uri = os.environ['WEBOOK_URI']
 def verify(event, context):
-    #if (event['token'] == VERIFICATION_TOKEN):
-    return event['challenge']
+    if (event['token'] == VERIFICATION_TOKEN):
+        return event['challenge']
 
 def process_postmessage(event,context):
     text = "Life is solitary, poor, nasty, brutish, and short"
@@ -33,30 +33,8 @@ def canned_response(event,context):
 
 def lambda_handler(event, context):
     # AWS calls this in response to a post request from slack
-    '''
-    {
-    "token": "XXYYZZ",
-    "team_id": "TXXXXXXXX",
-    "api_app_id": "AXXXXXXXXX",
-    "event": {
-            "type": "name_of_event",
-            "event_ts": "1234567890.123456",
-            "user": "UXXXXXXX1",
-            ...
-    },
-    "type": "event_callback",
-    "authed_users": [
-            "UXXXXXXX1",
-            "UXXXXXXX2"
-    ],
-    "event_id": "Ev08MFMKH6",
-    "event_time": 1234567890
-    }
-    '''
 
-    dispatch = {
-            "app_mention": canned_response,
-            }
+    dispatch = {"app_mention": canned_response}
 
     print("Event Passed to Handler: " + json.dumps(event))
 
@@ -66,8 +44,11 @@ def lambda_handler(event, context):
 
     elif event['type'] == 'event_callback':
         # Process event_callbacks
+        print('processing event_callback')
         event_type = event['event']['type']
-        dispatch[event_type](event,context)
+        print(event_type)
+        r = dispatch[event_type](event,context)
+        print(r)
     else:
         return {
             'statusCode': 200,
