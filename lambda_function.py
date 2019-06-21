@@ -1,8 +1,15 @@
 import json
+import numpy as np
 from botocore.vendored import requests
 
 VERIFICATION_TOKEN = 'WiZIOhg6d7K22FY1vJGHindS'
 ACCESS_TOKEN = 'xoxp-295199771607-293477083728-660133512179-729dd16f7cbc096a49fc776384c7140d'
+QUOTES = [
+        "During the time men live without a common power to keep them all in awe, they are in that conditions called war; and such a war, as if of every man, against every man.",
+        "Man gives indifferent names to one and the same thing from the difference of their own passions; as they that approve a private opinion call it opinion; but they that mislike it, heresy: and yet heresy signifies no more than private opinion",
+        "Words are wise men's counters, they do but reckon by them: but they are the money of fools, that value them by the authority of an Aristotle, a Cicero, or a Thomas, or any other doctor whatsoever, if but a man",
+        "Moral philosophy is nothing else but the science of what is good, and evil, in the conversation, and society of mankind. Good, and evil, are names that signify our appetites, and aversions; which in different tempers, customs, and doctrines of men, are different."
+        ]
 # uri = os.environ['WEBOOK_URI']
 def verify(event, context):
     if (event['token'] == VERIFICATION_TOKEN):
@@ -31,10 +38,22 @@ def canned_response(event,context):
 
     return r
 
+def random_canned_response(event, context):
+    q_idx = np.random.choice(np.arange(len(QUOTES)))
+
+    text = QUOTES[q_idx]
+    message = {
+        'token': ACCESS_TOKEN,
+        'channel': event['event']['channel'],
+        'text':text
+    }
+    r = requests.post('https://slack.com/api/chat.postMessage',data=message)
+
+
 def lambda_handler(event, context):
     # AWS calls this in response to a post request from slack
 
-    dispatch = {"app_mention": canned_response}
+    dispatch = {"app_mention": random_canned_response}
 
     print("Event Passed to Handler: " + json.dumps(event))
 
